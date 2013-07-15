@@ -15,16 +15,20 @@
         <put-attribute name="content" value="/WEB-INF/views/login.jsp"/>
     </definition>
 
-    <definition name="spittles/list" extends="template">
-        <put-attribute name="content" value="/WEB-INF/views/spittles/list.jsp"/>
-    </definition>
-
     <definition name="spitters/register">
         <put-attribute name="content" value="/WEB-INF/views/spitters/register.jsp"/>
     </definition>
 
     <definition name="spitters/{username}">
         <put-attribute name="content" value="/WEB-INF/views/spitters/viewSpitterProfile.jsp"/>
+    </definition>
+
+    <definition name="spittles/list" extends="template">
+        <put-attribute name="content" value="/WEB-INF/views/spittles/list.jsp"/>
+    </definition>
+
+    <definition name="/mySpitterCircle">
+        <put-attribute name="content" value="/WEB-INF/views/spittles/mySpitterCircle.jsp"/>
     </definition>
 
 </tiles-definitions>

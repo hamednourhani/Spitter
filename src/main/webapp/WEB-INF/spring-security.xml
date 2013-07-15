@@ -10,7 +10,7 @@
         <form-login login-processing-url="/static/j_spring_security_check"
                     login-page="/spitters/{username}"
                     authentication-failure-url="/home/" />
-        <intercept-url pattern="/spitters/edit" requires-channel="https" />
+        <intercept-url pattern="/spitters/register" requires-channel="https" />
         <intercept-url pattern="/home" requires-channel="http" />
         <logout logout-url="/static/j_spring_security_logout"/>
         <logout logout-success-url="/home" />

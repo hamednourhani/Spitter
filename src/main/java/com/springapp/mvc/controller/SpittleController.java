@@ -4,8 +4,8 @@ import com.springapp.mvc.model.Spitter;
 import com.springapp.mvc.model.Spittle;
 import com.springapp.mvc.repository.SpitterRepository;
 import com.springapp.mvc.repository.SpittleRepository;
-import com.springapp.mvc.service.SpitterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -17,8 +17,8 @@ import javax.inject.Inject;
 @Controller
 public class SpittleController {
 
-    SpitterRepository spitterRepository;
-    SpittleRepository spittleRepository;
+    private SpitterRepository spitterRepository;
+    private SpittleRepository spittleRepository;
 
     public SpittleController() {
     }
@@ -32,7 +32,7 @@ public class SpittleController {
     @RequestMapping(method = RequestMethod.GET)
     public String getRecentSpittles(Model model){
         model.addAttribute("message", "Log in to continue");
-        return "home";
+        return "/home";
     }
 
     @RequestMapping(value = "/spittles", method = RequestMethod.GET)
@@ -46,9 +46,16 @@ public class SpittleController {
     @RequestMapping(value="${spitter.userName}", method = RequestMethod.POST)
     public String postSpittle(@ModelAttribute("spittle") Spittle spittle){
         Spitter spitter = new Spitter();
-        spittle.setId(spitter.getId());
+        spittle.setSpitter(spitter);
         spittleRepository.add(spittle);
-        return "redirect:home";
+        return "/home";
+    }
+
+    @RequestMapping(value = "/spittles/mySpitterCircle", method = RequestMethod.GET)
+    public String getSpittles(Model model){
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("followeeSpittleList", spitterRepository.getFolloweeSpittlesForSpitter(user.getName()));
+        return "/spittles/mySpitterCircle";
     }
 
 }

@@ -1,16 +1,14 @@
 package com.springapp.mvc.controller;
 
-import com.springapp.mvc.model.Follower;
 import com.springapp.mvc.model.Spitter;
 import com.springapp.mvc.model.Spittle;
 import com.springapp.mvc.repository.SpitterRepository;
 import com.springapp.mvc.repository.SpittleRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,17 +62,16 @@ public class SpitterController {
     @RequestMapping(value = "/{username}/follow", method = RequestMethod.POST)
     public String follow(@PathVariable String username){
 
-        User user = (User) SecurityContextHolder.getContext().getAuthentication();
-        Spitter spitter = spitterRepository.findByUserName(user.getUsername());
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        Spitter spitter = spitterRepository.findByUserName(user.getName());
         Spitter followee = spitterRepository.findByUserName(username);
 
         if(spitterRepository.isUserFollowing(spitter, followee)){
-            return "spitters/{username}";
+            return "redirect:/spitters/viewSpitterProfile";
         }
 
-        spitter.addFollowee(followee);
-        //spitterRepository.addFollower(spitter, follower);
-        return "spitters/{username}";
+        spitterRepository.addFollowee(spitter, followee);
+        return "redirect:/spitters/viewSpitterProfile";
     }
 
 }

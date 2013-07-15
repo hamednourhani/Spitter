@@ -24,7 +24,9 @@
         <s:url value="/spitters/${current_user}"
                var="user_profile_url"/>
         <a href="${user_profile_url}">My Spittles</a>
-        <a href="/static/j_spring_security_logout">Logout</a>
+
+        <s:url value="/static/j_spring_security_logout" var="logout_url"/>
+        <a href="${logout_url}">Logout</a>
         <h2>Hello ${current_user}!</h2>
     </security:authorize>
 
@@ -49,19 +51,15 @@
 
 <div id="userSpits" style="float:left">
 
-    <s:url value="{spitterName}/follow" var="follow_url"/>
-    <a href="${follow_url}">Follow ${spitterName}!</a> <br/> <br/>
+    <s:url value="/follow" var="follow_url"/>
+    <a href="${follow_url}">Follow ${spitterName}</a> <br/> <br/>
 
     <h3>These are ${spitterName}'s recent spittles: </h3>
     <ol class="spittle-list">
         <c:forEach var="spittle" items="${spittles}">
-            <s:url value="/spitters/{spitterName}" var="spitter_url">
-                <s:param name="spitterName" value="${spittle.spitterUserName}"/>
-            </s:url>
-
             <li>
             <span class="spittleListText">
-                <c:out value="${spittle.spitterUserName}"/>
+                <c:out value="${spittle.spitter.userName}"/>
                 - <c:out value="${spittle.text}"/> <br>
                 <small><c:out value="${spittle.date}"/></small>
             </span>
@@ -78,7 +76,7 @@
         <s:url var="authUrl" value="/static/j_spring_security_check"/>
         <form method="post" class="signin" action="${authUrl}">
             <fieldset>
-                <table cellspacing="0">
+                <table>
                     <tr>
                         <th><label for="username_or_email">Username or Email</label></th>
                         <td><input id="username_or_email" name="j_username" type="text"/></td>

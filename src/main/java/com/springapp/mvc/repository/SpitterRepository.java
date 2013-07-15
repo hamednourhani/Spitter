@@ -17,5 +17,6 @@ public interface SpitterRepository {
     public List<Spitter> getFollowers(Spitter spitter);
     public List<Spitter> getFollowees(Spitter spitter);
     public boolean isUserFollowing(Spitter spitter, Spitter followee);
+    public List<Spittle> getFolloweeSpittlesForSpitter(String username);
     public List<Spittle> getFolloweeSpittlesForSpitter(Spitter spitter);
 }

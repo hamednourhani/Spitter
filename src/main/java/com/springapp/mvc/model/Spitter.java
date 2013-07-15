@@ -1,7 +1,6 @@
 package com.springapp.mvc.model;
 
 import com.google.common.collect.Lists;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -34,7 +33,6 @@ public class Spitter implements Serializable {
     @Column(name="FULLNAME")
     private String fullName;
 
-    @Size(min = 1, max = 50)
     @Pattern(regexp = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,4}", message = "Invalid email address.")
     @Column(name="EMAIL")
     private String email;
@@ -101,7 +99,6 @@ public class Spitter implements Serializable {
     }
 
     public void addFollowee(Spitter followee){
-        //Follower follower = new Follower(this, spitter);
         Followee follow = new Followee(this, followee);
         addFollowee(follow);
     }

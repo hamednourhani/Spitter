@@ -2,7 +2,8 @@ package com.springapp.mvc.controller;
 
 
 import com.springapp.mvc.model.Spittle;
-import com.springapp.mvc.service.SpitterService;
+import com.springapp.mvc.repository.SpitterRepository;
+import com.springapp.mvc.repository.SpittleRepository;
 import org.junit.Test;
 import org.springframework.validation.BindingResult;
 
@@ -22,11 +23,11 @@ public class HomeControllerTest {
     public void shouldDisplayRecentSpittles(){
         List<Spittle> expectedSpittles = asList(new Spittle(), new Spittle(), new Spittle());
         Spittle spittle = new Spittle();
-        SpitterService spitterService = mock(SpitterService.class);
+        SpittleRepository spittleRepository = mock(SpittleRepository.class);
+        SpitterRepository spitterRepository = mock(SpitterRepository.class);
+        when(spittleRepository.getRecentSpittles(25)).thenReturn(expectedSpittles);
 
-        when(spitterService.getSpittleList(25)).thenReturn(expectedSpittles);
-
-        HomeController controller = new HomeController(spitterService);
+        HomeController controller = new HomeController(spittleRepository, spitterRepository);
         BindingResult bindingResult = mock(BindingResult.class);
         HashMap<String, Object> model = new HashMap<String, Object>();
         String viewName = controller.showHomePage(spittle, model, bindingResult);
@@ -34,7 +35,7 @@ public class HomeControllerTest {
         assertEquals("home", viewName);
 
         assertSame(expectedSpittles, model.get("spittleList"));
-        verify(spitterService).getSpittleList(25);
+        verify(spittleRepository).getRecentSpittles(25);
     }
 
 

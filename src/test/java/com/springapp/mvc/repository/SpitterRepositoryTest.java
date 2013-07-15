@@ -61,6 +61,24 @@ public class SpitterRepositoryTest extends AbstractTransactionalJUnit4SpringCont
     }
 
     @Test
+    public void addFollowee() throws Exception {
+        //creating first spitter
+        Spitter spitter1 = new Spitter();
+        spitter1.setFullName("Bill Gates");
+        spitter1.setPassword("microsoft");
+        spitter1.setUserName("BillyGates");
+
+        //creating second spitter
+        Spitter spitter2 = new Spitter();
+        spitter2.setFullName("Steve Jobs");
+        spitter2.setUserName("SteveJobs");
+        spitter2.setPassword("apple1");
+
+
+
+    }
+
+    @Test
     public void findByUserName_ShouldReturnASpitter(){
         //creating first spitter
         Spitter spitter1 = new Spitter();
@@ -148,11 +166,7 @@ public class SpitterRepositoryTest extends AbstractTransactionalJUnit4SpringCont
         persist(spitter1);
         persist(spitter2);
 
-        Followee follow = new Followee(spitter1, spitter2);
-        em.merge(follow);
-        em.flush();
-        em.clear();
-        spitter1.addFollowee(follow);
+        spitterRepository.addFollowee(spitter1, spitter2);
 
         boolean result = spitterRepository.isUserFollowing(spitter1, spitter2);
         assertThat(result, is(true));

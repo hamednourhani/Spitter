@@ -1,23 +1,36 @@
 package com.springapp.mvc.controller;
 
+
 import com.springapp.mvc.model.Spitter;
 import com.springapp.mvc.model.Spittle;
 import com.springapp.mvc.repository.SpitterRepository;
 import com.springapp.mvc.repository.SpittleRepository;
-import com.springapp.mvc.service.SpitterService;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 
-public class SpitterControllerTest {
+@ContextConfiguration({"classpath:test-context-jpa.xml"})
+@TransactionConfiguration(defaultRollback = true)
+public class SpitterControllerTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Test
     public void listSpittlesForSpitter(){
@@ -114,5 +127,40 @@ public class SpitterControllerTest {
         String result = controller.showSpitterProfile(spitter.getUserName(), new Spittle(), map);
 
         assertThat(result, is("spitters/viewSpitterProfile"));
+    }
+
+    @PersistenceContext
+    EntityManager em;
+
+    @Autowired
+    SpitterRepository spitterRepository;
+
+    @Test
+    public void follow() throws Exception {
+
+        Spitter spitter = new Spitter();
+        spitter.setFullName("Bill Gates");
+        spitter.setPassword("microsoft");
+        spitter.setUserName("BillGates");
+
+        Spitter spitter1 = new Spitter("SteveJobs", null, "apple1", "Steve Jobs");
+
+        SpittleRepository spittleRepository = mock(SpittleRepository.class);
+        SpitterController controller = new SpitterController(spitterRepository, spittleRepository);
+
+        spitterRepository.addSpitter(spitter);
+        spitterRepository.addSpitter(spitter1);
+
+        Authentication auth = mock(Authentication.class);
+        when(auth.getName()).thenReturn(spitter1.getUserName());
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(securityContext);
+
+        String result = controller.follow(spitter.getUserName());
+        Spitter resultingSpitter = em.find(Spitter.class, spitter1.getId());
+
+        assertThat(result, is("spitters/{username}"));
+        assertThat(spitterRepository.getFollowees(resultingSpitter), hasItem(spitter));
     }
 }

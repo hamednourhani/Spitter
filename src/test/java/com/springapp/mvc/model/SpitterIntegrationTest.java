@@ -1,6 +1,8 @@
 package com.springapp.mvc.model;
 
+import com.springapp.mvc.repository.SpitterRepository;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -47,6 +49,32 @@ public class SpitterIntegrationTest extends AbstractTransactionalJUnit4SpringCon
         assertThat(persistedSpitter.getEmail(), is(spitter.getEmail()));
         assertThat(persistedSpitter.getFullName(), is(spitter.getFullName()));
 
+    }
+
+    @Autowired
+    SpitterRepository spitterRepository;
+
+
+    @Test
+    public void addFollowee() throws Exception {
+        Spitter spitter1 = new Spitter("username", "email@email.com", "password", "full name");
+        Spitter spitter2 = new Spitter();
+        spitter2.setUserName("BillGates");
+        spitter2.setPassword("microsoft");
+        spitter2.setFullName("Bill Gates");
+
+        persist(spitter1);
+        persist(spitter2);
+
+        Followee follow = new Followee(spitter1, spitter2);
+        spitter1.addFollowee(follow);
+        em.merge(spitter1);
+        em.flush();
+        em.clear();
+
+        Spitter spitter = em.find(Spitter.class, spitter1.getId());
+
+        assertThat(spitter.getFollowees(), hasItem(follow));
     }
 
     private void persist(Spitter spitter){

@@ -9,17 +9,17 @@
 <body>
 
 <div style="float:left">
-    <h3>Lets see what the recent spits are: </h3>
+    <h3>Lets see what your Spitter Circle is spitting: </h3>
     <ol class="spittle-list">
         <c:forEach var="spittle" items="${followeeSpittleList}">
             <s:url value="/spitters/{spitterName}" var="spitter_url">
-                <s:param name="spitterName" value="${spittle.spitterUserName}"/>
+                <s:param name="spitterName" value="${spittle.spitter.userName}"/>
             </s:url>
 
             <li>
             <span class="spittleListText">
-                <s:url value="/spitters/${spittle.spitterUserName}" var="userName_url"/>
-                <a href="${userName_url}"><c:out value="${spittle.spitterUserName}"/></a>
+                <s:url value="/spitters/${spittle.spitter.userName}" var="userName_url"/>
+                <a href="${userName_url}"><c:out value="${spittle.spitter.userName}"/></a>
                 - <c:out value="${spittle.text}"/> <br>
                 <small><c:out value="${spittle.date}"/></small>
             </span>

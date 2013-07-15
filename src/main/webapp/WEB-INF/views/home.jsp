@@ -24,7 +24,12 @@
         <s:url value="/spitters/${current_user}"
         var="user_profile_url"/>
         <a href="${user_profile_url}">My Spittles</a>
-        <a href="/static/j_spring_security_logout">Logout</a>
+
+        <s:url value="/spittles/mySpitterCircle" var="spitterCircle_url" />
+        <a href="${spitterCircle_url}">My Spitter Circle</a>
+
+        <s:url value="/static/j_spring_security_logout" var="logout_url"/>
+        <a href="${logout_url}">Logout</a>
         <h2>Hello ${current_user}!</h2>
     </security:authorize>
 
@@ -51,14 +56,11 @@
     <h3>Lets see what the recent spits are: </h3>
     <ol class="spittle-list">
         <c:forEach var="spittle" items="${spittleList}">
-            <s:url value="/spitters/{spitterName}" var="spitter_url">
-                <s:param name="spitterName" value="${spittle.spitterUserName}"/>
-            </s:url>
 
             <li>
             <span class="spittleListText">
-                <s:url value="/spitters/${spittle.spitterUserName}" var="userName_url"/>
-                <a href="${userName_url}"><c:out value="${spittle.spitterUserName}"/></a>
+                <s:url value="/spitters/${spittle.spitter.userName}" var="userName_url"/>
+                <a href="${userName_url}"><c:out value="${spittle.spitter.userName}"/></a>
                 - <c:out value="${spittle.text}"/> <br>
                 <small><c:out value="${spittle.date}"/></small>
             </span>

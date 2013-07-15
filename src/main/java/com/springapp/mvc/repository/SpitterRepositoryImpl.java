@@ -1,7 +1,6 @@
 package com.springapp.mvc.repository;
 
 import com.springapp.mvc.model.Followee;
-import com.springapp.mvc.model.Follower;
 import com.springapp.mvc.model.Spitter;
 import com.springapp.mvc.model.Spittle;
 import org.springframework.stereotype.Repository;
@@ -89,14 +88,18 @@ public class SpitterRepositoryImpl implements SpitterRepository {
     }
 
     @Override
-    public List<Spittle> getFolloweeSpittlesForSpitter(Spitter spitter){
+    public List<Spittle> getFolloweeSpittlesForSpitter(String username){
         String hql = "SELECT s FROM Spittle s, Followee f " +
                 "WHERE f.spitter.userName = :spitterUserName " +
-                "AND s.spitter = f.followee";
+                "AND s.spitter = f.followee ORDER BY s.id DESC";
 
         TypedQuery<Spittle> query = em.createQuery(hql, Spittle.class)
-                .setParameter("spitterUserName", spitter.getUserName());
+                .setParameter("spitterUserName", username);
         return query.getResultList();
+    }
+
+    public List<Spittle> getFolloweeSpittlesForSpitter(Spitter spitter){
+        return getFolloweeSpittlesForSpitter(spitter.getUserName());
     }
 
 }
