@@ -4,7 +4,6 @@ import com.springapp.mvc.model.Spitter;
 import com.springapp.mvc.model.Spittle;
 import com.springapp.mvc.repository.SpitterRepository;
 import com.springapp.mvc.repository.SpittleRepository;
-import com.springapp.mvc.service.SpitterService;
 import org.junit.Test;
 import org.springframework.ui.Model;
 
