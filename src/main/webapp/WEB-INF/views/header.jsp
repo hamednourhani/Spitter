@@ -1,17 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
-
-<html>
-<head>
-    <title>Registration - Spitter</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
-</head>
-<body>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <div class="navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner">
@@ -51,7 +40,7 @@
                                placeholder="Username"/>
                         <input class="span2" id="password" name="j_password" type="password" placeholder="Password"/>
                         <input class="span2" id="remember_me" name="_spring_security_remember_me" type="checkbox"/>
-                        <label for="remember_me" class="inline">Remember Me</label>
+                        <label for="remember_me" class="inline" style="color: #858585;">Remember Me</label>
                         <button name="commit" type="submit" class="btn" value="Sign in">Sign in</button>
                         <!--<input name="commit" type="submit" value="Sign in"/> -->
 
@@ -66,50 +55,28 @@
     </div>
 </div>
 
-<div>
-    <h2>Create a free Spitter account</h2>
-    <sf:form method="POST" modelAttribute="spitter" action="spitters/register">
-        <fieldset>
-            <table cellspacing="0">
-                <tr>
-                    <th><label for="fullName"> Full name:</label></th>
-                    <td>
-                        <sf:input path="fullName" size="15" id="fullName"/><br>
-                        <sf:errors path="fullName" cssClass="error"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="userName">Username: </label></th>
-                    <td>
-                        <sf:input path="userName" size="15" maxlength="30" id="userName"/>
-                        <small id="userName_msg">No spaces, please.</small>
-                        <br>
-                        <sf:errors path="userName" cssClass="error"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="password">Password:</label></th>
-                    <td>
-                        <sf:password path="password" size="15" showPassword="false" maxlength="30" id="password"/>
-                        <small>6 characters or more</small>
-                        <br>
-                        <sf:errors path="password" cssClass="error"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="email"> Email address:</label></th>
-                    <td>
-                        <sf:input path="email" size="30" id="email"/>
-                        <small>In case you forget something</small>
-                        <sf:errors path="email" cssClass="error"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th><input type="submit" value="Submit!"></th>
-                </tr>
-            </table>
-        </fieldset>
-    </sf:form>
-</div>
-</body>
-</html>
+
+
+<security:authorize access="! isAuthenticated()">
+    <h2>Hello Guest!</h2><br>
+    <s:url value="/spitters/register" var="register_url"/>
+    <a href="${register_url}">Register</a>
+</security:authorize>
+
+<s:url value="/home" var="home_url" />
+<a href="${home_url}">Home</a>
+
+<security:authorize access="isAuthenticated()">
+    <security:authentication property="principal.username" var="current_user"/>
+
+    <s:url value="/spitters/${current_user}"
+           var="user_profile_url"/>
+    <a href="${user_profile_url}">My Spittles</a>
+
+    <s:url value="/spittles/mySpitterCircle" var="spitterCircle_url" />
+    <a href="${spitterCircle_url}">My Spitter Circle</a>
+
+    <s:url value="/static/j_spring_security_logout" var="logout_url"/>
+    <a href="${logout_url}">Logout</a>
+    <h2>Hello ${current_user}!</h2>
+</security:authorize>
