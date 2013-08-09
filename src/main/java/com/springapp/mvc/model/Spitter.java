@@ -1,7 +1,6 @@
 package com.springapp.mvc.model;
 
 import com.google.common.collect.Lists;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
@@ -18,16 +17,17 @@ public class Spitter implements Serializable {
     @Column(name="ID")
     private int id;
 
-    @NotEmpty
     @Pattern(regexp="^[a-zA-Z0-9]+$", message="Username must be alphanumeric with no spaces.")
     @Size(min = 1, max = 30, message = "Username must be at least 1 character long.")
     @Column(name="USERNAME")
     private String userName;
 
-    @NotEmpty
     @Size(min = 6, max = 30, message = "The password must be at least 6 characters long.")
     @Column(name="PASSWORD")
     private String password;
+
+    @Transient
+    private String verifyPassword;
 
     @Size(min = 3, max = 50, message = "Your full name must be between 3 to 50 characters long.")
     @Column(name="FULLNAME")
@@ -92,6 +92,14 @@ public class Spitter implements Serializable {
 
     public int getId(){
         return this.id;
+    }
+
+    public String getVerifyPassword() {
+        return verifyPassword;
+    }
+
+    public void setVerifyPassword(String verifyPassword) {
+        this.verifyPassword = verifyPassword;
     }
 
     public List<Followee> getFollowees() {

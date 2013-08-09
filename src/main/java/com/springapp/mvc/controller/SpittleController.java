@@ -29,20 +29,6 @@ public class SpittleController {
         this.spittleRepository = spittleRepository;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String getRecentSpittles(Model model){
-        model.addAttribute("message", "Log in to continue");
-        return "/home";
-    }
-
-    @RequestMapping(value = "/spittles", method = RequestMethod.GET)
-    public String listSpittlesForSpitter(@RequestParam("spitter") String username, Model model){
-        Spitter spitter = spitterRepository.findByUserName(username);
-        model.addAttribute(spitter);
-        model.addAttribute(spittleRepository.getSpittlesForSpitter(spitter));
-        return "spittles/list";
-    }
-
     @RequestMapping(value="${spitter.userName}", method = RequestMethod.POST)
     public String postSpittle(@ModelAttribute("spittle") Spittle spittle){
         Spitter spitter = new Spitter();
@@ -51,11 +37,12 @@ public class SpittleController {
         return "/home";
     }
 
-    @RequestMapping(value = "/spittles/mySpitterCircle", method = RequestMethod.GET)
+    @RequestMapping(value = "/mySpitterCircle", method = RequestMethod.GET)
     public String getSpittles(Model model){
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         model.addAttribute("followeeSpittleList", spitterRepository.getFolloweeSpittlesForSpitter(user.getName()));
-        return "/spittles/mySpitterCircle";
+        model.addAttribute("spittle", new Spittle());
+        return "/mySpitterCircle";
     }
 
 }

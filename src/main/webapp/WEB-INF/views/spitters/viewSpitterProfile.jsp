@@ -4,112 +4,129 @@
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<div class="center">
+    <div id="header" style="display:inline;">
+        <div class="div-border" style="margin: 10px; overflow: hidden;">
+            <h2 style="float: left">Viewing ${spitterName}'s Profile</h2>
 
-<html>
-<head>
-    <title>${username} profile - Spitter</title>
+            <ul id="headerList">
+                <li>
+                    <security:authorize access="isAuthenticated()">
+                        <c:url value="/spitters/profile/${spitterName}/follow" var="followUrl" />
+                        <form method="link" action="${followUrl}">
+                            <input type="submit" value="Follow!" class="btn" style="border-color: #757575;"/>
+                        </form>
+                    </security:authorize>
+                </li>
 
-    <security:authorize access="! isAuthenticated()">
-        <h2>Hello Guest!</h2><br>
-        <s:url value="/spitters/register" var="register_url"/>
-        <a href="${register_url}">Register</a>
-    </security:authorize>
+                <li>
+                    <security:authorize access="isAuthenticated()">
+                        <c:url value="/spitters/profile/${spitterName}/viewFollowees" var="followeesUrl" />
+                        <form method="link" action="${followeesUrl}">
+                            <input type="submit" value="Following" class="btn" style="border-color: #757575;"/>
+                        </form>
+                    </security:authorize>
+                </li>
 
-    <s:url value="/home" var="home_url" />
-    <a href="${home_url}">Home</a>
+                <li>
+                    <security:authorize access="isAuthenticated()">
+                        <c:url value="/spitters/profile/${spitterName}/viewFollowers" var="followersUrl" />
+                        <form method="link" action="${followersUrl}">
+                            <input type="submit" value="Followers" class="btn" style="border-color: #757575;"/>
+                        </form>
+                    </security:authorize>
+                </li>
 
-    <security:authorize access="isAuthenticated()">
-        <security:authentication property="principal.username" var="current_user"/>
+                <li>
+                    <security:authorize access="isAuthenticated()">
+                        <c:url value="/spitters/profile/${spitterName}" var="followUrl" />
+                        <form method="link" action="${followUrl}">
+                            <input id="followButton" type="submit" value="${spitterName}'s Profile"
+                                   class="btn" style="border-color: #757575;"/>
+                        </form>
+                    </security:authorize>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-        <s:url value="/spitters/${current_user}"
-               var="user_profile_url"/>
-        <a href="${user_profile_url}">My Spittles</a>
-
-        <s:url value="/static/j_spring_security_logout" var="logout_url"/>
-        <a href="${logout_url}">Logout</a>
-        <h2>Hello ${current_user}!</h2>
-    </security:authorize>
-
-</head>
-<body>
-
-<div>
     <security:authorize access="hasRole('ROLE_SPITTER')">
-        <s:url value="../home" var="spittle_url"/>
-        <sf:form modelAttribute="spittle" action="${spittle_url}">
-            <sf:label path="text"> <s:message text="Enter spittle: "/></sf:label>
-            <sf:textarea path="text" rows="2" cols="40"/>
-            <sf:errors path="text"/>
-            <br>
+        <div id="spittle" class="div-border-pulled-left" style="margin:10px;">
+            <s:url value="/home" var="spittle_url"/>
+            <sf:form modelAttribute="spittle" action="${spittle_url}">
+                <label> <s:message text="Enter spittle: "/></label><br>
+                <sf:textarea id="spittleTextBox" cssClass="form-control" path="text" rows="3" cols="40"
+                             onkeydown="press(event)"/>
+                <sf:errors path="text" cssClass="error"/><br>
 
-            <div class="spitItSubmitIt">
-                <input type="submit" value="Spit it!" class="status-btn round-btn disabled"/>
-            </div>
-        </sf:form>
-    </security:authorize>
-</div>
+                <div class="spitItSubmitIt">
+                    <input type="submit" value="Spit it!" class="btn btn-small" style="border-color: #757575;"/>
+                </div>
+            </sf:form>
+        </div>
 
-<div id="userSpits" style="float:left">
+        <script>
+            document.getElementById("spittleTextBox").focus();
 
-    <s:url value="/follow" var="follow_url"/>
-    <a href="${follow_url}">Follow ${spitterName}</a> <br/> <br/>
-
-    <h3>These are ${spitterName}'s recent spittles: </h3>
-    <ol class="spittle-list">
-        <c:forEach var="spittle" items="${spittles}">
-            <li>
-            <span class="spittleListText">
-                <c:out value="${spittle.spitter.userName}"/>
-                - <c:out value="${spittle.text}"/> <br>
-                <small><c:out value="${spittle.date}"/></small>
-            </span>
-            </li>
-        </c:forEach>
-    </ol>
-
-</div>
-
-
-<div id="login" style="float:right">
-    <security:authorize access="!isAuthenticated()">
-        ${message}
-        <s:url var="authUrl" value="/static/j_spring_security_check"/>
-        <form method="post" class="signin" action="${authUrl}">
-            <fieldset>
-                <table>
-                    <tr>
-                        <th><label for="username_or_email">Username or Email</label></th>
-                        <td><input id="username_or_email" name="j_username" type="text"/></td>
-                    </tr>
-                    <tr>
-                        <th><label for="password">Password </label></th>
-                        <td>
-                            <input id="password" name="j_password" type="password"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td>
-                            <input id="remember_me" name="_spring_security_remember_me" type="checkbox"/>
-                            <label for="remember_me" class="inline">Remember Me</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td><input name="commit" type="submit" value="Sign in"/></td>
-                    </tr>
-                </table>
-            </fieldset>
-        </form>
-
-        <script type="text/javascript">
-            document.getElementById('username_or_email').focus();
+            function press(e) {
+                if ((window.event ? event.keyCode : e.which) == 13) {
+                    document.forms[0].submit();
+                }
+            }
         </script>
-
     </security:authorize>
 
+    <div id="spittleList" class="div-border-pulled-left fixedheightcontainer"
+         style="padding-right: 40px; margin: 10px;">
+
+        <h3>These are ${spitterName}'s recent spittles: </h3>
+
+        <div class="Content">
+            <ol>
+                <c:forEach var="spittle" items="${spittles}">
+                    <li class="wrapWord">
+            <span class="spittleListText">
+                        <s:url value="/spitters/profile/${spittle.spitter.userName}" var="userName_url"/>
+                        <div class="panel" style="border-color: #296EAB;">
+                            <div class="panel-heading" style="border-bottom-color: #64B354;">
+                                <a href="${userName_url}"><c:out value="${spittle.spitter.userName}"/></a>
+                                -
+                                <small><c:out value="${spittle.date}"/></small>
+                            </div>
+                            <c:out value="${spittle.text}"/>
+                        </div>
+            </span>
+                    </li>
+                </c:forEach>
+            </ol>
+        </div>
+    </div>
 </div>
 
 
-</body>
-</html>
+<script>
+
+    $(document).ready(function(){
+        initialize();
+    });
+
+    function initialize(){
+        $("#followButton").click(function(event){
+                checkIfFollowing()
+        });
+    }
+
+    function checkIfFollowing(){
+
+        var username = ${spitterName};
+
+        $.ajax({
+            type: "POST",
+            url: "/spitters/isUserFollowing",
+            data: "username=" + username,
+            success: function(data){
+                window.alert(data);
+            }
+        });
+    }
+</script>

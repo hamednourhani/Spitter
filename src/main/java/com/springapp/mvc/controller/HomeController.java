@@ -8,11 +8,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.Map;
 
 @Transactional
@@ -26,29 +29,48 @@ public class HomeController {
     }
 
     @Inject
-    public HomeController(SpittleRepository spittleRepository, SpitterRepository spitterRepository){
+    public HomeController(SpitterRepository spitterRepository, SpittleRepository spittleRepository){
         this.spittleRepository = spittleRepository;
         this.spitterRepository = spitterRepository;
     }
 
     @RequestMapping(value =  {"/", "/home"}, method = RequestMethod.GET)
-    public String showHomePage(Spittle spittle, Map<String, Object> model, BindingResult binding){
+    public String showHomePage(Map<String, Object> model) throws IllegalStateException{
         getSpittleList(model);
         model.put("spittle", new Spittle());
-        return "/home";
+        return "home";
     }
 
     @RequestMapping(value = "/home", method = RequestMethod.POST)
-    public String spit(Spittle spittle, Map<String, Object> model, BindingResult binding)
+    public String spit(@ModelAttribute("spittle") @Valid Spittle spittle, BindingResult binding, Map<String, Object> model)
             throws IllegalStateException{
-        if (binding.hasErrors())
-            return "/home";
 
-        model.put("spittle", spittle);
+        if (binding.hasErrors()){
+            getSpittleList(model);
+            return "home";
+        }
+
         spittle = getSpittleDetails(spittle);
+        model.put("spittle", spittle);
         spittleRepository.add(spittle);
         getSpittleList(model);
-        return "/home";
+        return "home";
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String createSpitterProfile(Model model){
+        model.addAttribute("spitter", new Spitter());
+        return "/register";
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String addSpitterFromForm(@Valid Spitter spitter, BindingResult bindingResult, Map<String, Object> model){
+        if (bindingResult.hasErrors())
+            return "/register";
+
+        spitterRepository.addSpitter(spitter);
+        getSpittleList(model);
+        return "home";
     }
 
     private void getSpittleList(Map<String, Object> model){

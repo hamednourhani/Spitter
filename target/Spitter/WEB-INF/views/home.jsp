@@ -5,109 +5,70 @@
 <%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 
-<html>
-<head>
-    <title>Home - Spitter</title>
+<div id="box border" class="center">
 
-    <security:authorize access="! isAuthenticated()">
-        <h2>Hello Guest!</h2><br>
-        <s:url value="/spitters/register" var="register_url"/>
-        <a href="${register_url}">Register</a>
-    </security:authorize>
+    <div id="header" style="display:inline;">
+        <div class="div-border" style="margin: 10px;">
+            <security:authorize access="! isAuthenticated()">
+                <h2>Hello Guest!</h2>
+            </security:authorize>
+            <security:authorize access="isAuthenticated()">
+                <security:authentication property="principal.username" var="current_user"/>
+                <h2>Hello ${current_user}!</h2>
+            </security:authorize>
+        </div>
+    </div>
 
-    <s:url value="/home" var="home_url" />
-    <a href="${home_url}">Home</a>
-
-    <security:authorize access="isAuthenticated()">
-        <security:authentication property="principal.username" var="current_user"/>
-
-        <s:url value="/spitters/${current_user}"
-        var="user_profile_url"/>
-        <a href="${user_profile_url}">My Spittles</a>
-
-        <s:url value="/spittles/mySpitterCircle" var="spitterCircle_url" />
-        <a href="${spitterCircle_url}">My Spitter Circle</a>
-
-        <s:url value="/static/j_spring_security_logout" var="logout_url"/>
-        <a href="${logout_url}">Logout</a>
-        <h2>Hello ${current_user}!</h2>
-    </security:authorize>
-
-</head>
-<body>
-
-<div>
     <security:authorize access="hasRole('ROLE_SPITTER')">
-        <s:url value="/home" var="spittle_url"/>
-        <sf:form modelAttribute="spittle" action="${spittle_url}">
-            <sf:label path="text"> <s:message text="Enter spittle: "/></sf:label>
-            <sf:textarea path="text" rows="2" cols="40"/>
-            <sf:errors path="text"/>
-            <br>
+        <div id="spittleBox" class="div-border-pulled-left" style="margin: 10px;">
+            <s:url value="/home" var="spittle_url"/>
+            <sf:form modelAttribute="spittle" action="${spittle_url}">
+                <label> <s:message text="Enter spittle: "/></label><br>
+                <sf:textarea id="spittleTextBox" cssClass="form-control" path="text" rows="3" cols="40"
+                             onkeydown="press(event)"/>
+                <sf:errors path="text" cssClass="error"/>
+                <br>
 
-            <div class="spitItSubmitIt">
-                <input type="submit" value="Spit it!" class="status-btn round-btn disabled"/>
-            </div>
-        </sf:form>
-    </security:authorize>
-</div>
+                <div class="spitItSubmitIt">
+                    <input type="submit" value="Spit it!" class="btn btn-small" style="border-color: #757575;"/>
+                </div>
+            </sf:form>
+        </div>
 
-<div style="float:left">
-    <h3>Lets see what the recent spits are: </h3>
-    <ol class="spittle-list">
-        <c:forEach var="spittle" items="${spittleList}">
+        <script>
+            document.getElementById("spittleTextBox").focus();
 
-            <li>
-            <span class="spittleListText">
-                <s:url value="/spitters/${spittle.spitter.userName}" var="userName_url"/>
-                <a href="${userName_url}"><c:out value="${spittle.spitter.userName}"/></a>
-                - <c:out value="${spittle.text}"/> <br>
-                <small><c:out value="${spittle.date}"/></small>
-            </span>
-            </li>
-        </c:forEach>
-    </ol>
-</div>
-
-<div id="login" style="float:right">
-    <security:authorize access="!isAuthenticated()">
-        ${message}
-        <s:url var="authUrl" value="/static/j_spring_security_check"/>
-        <form method="post" class="signin" action="${authUrl}">
-            <fieldset>
-                <table cellspacing="0">
-                    <tr>
-                        <th><label for="username_or_email">Username or Email</label></th>
-                        <td><input id="username_or_email" name="j_username" type="text"/></td>
-                    </tr>
-                    <tr>
-                        <th><label for="password">Password </label></th>
-                        <td>
-                            <input id="password" name="j_password" type="password"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td>
-                            <input id="remember_me" name="_spring_security_remember_me" type="checkbox"/>
-                            <label for="remember_me" class="inline">Remember Me</label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td><input name="commit" type="submit" value="Sign in"/></td>
-                    </tr>
-                </table>
-            </fieldset>
-        </form>
-
-        <script type="text/javascript">
-            document.getElementById('username_or_email').focus();
+            function press(e) {
+                if ((window.event ? event.keyCode : e.which) == 13) {
+                    document.forms[0].submit();
+                }
+            }
         </script>
-
     </security:authorize>
 
-</div>
+    <div id="spittleList" class="div-border-pulled-left fixedheightcontainer"
+         style="padding-right: 40px; margin: 10px;">
+        <h3>Lets see what the recent spits are: </h3>
 
-</body>
-</html>
+        <div class="Content">
+            <ol>
+                <c:forEach var="spittle" items="${spittleList}">
+                    <li class="wrapWord">
+                    <span class="spittleListText">
+                        <s:url value="/spitters/profile/${spittle.spitter.userName}" var="userName_url"/>
+                        <div class="panel" style="border-color: #296EAB;">
+                            <div class="panel-heading" style="border-bottom-color: #64B354;">
+                                <a href="${userName_url}"><c:out value="${spittle.spitter.userName}"/></a>
+                                -
+                                <small><c:out value="${spittle.date}"/></small>
+                            </div>
+                            <c:out value="${spittle.text}"/>
+                        </div>
+                    </span>
+                    </li>
+                </c:forEach>
+            </ol>
+        </div>
+    </div>
+
+</div>

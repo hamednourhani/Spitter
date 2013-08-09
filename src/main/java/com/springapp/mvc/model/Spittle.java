@@ -1,6 +1,8 @@
 package com.springapp.mvc.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
@@ -17,6 +19,8 @@ public class Spittle {
     private Spitter spitter;
 
     @Column(name="TEXT")
+    @NotNull
+    @Size(min = 1, max = 140, message = "Must be between 1 and 140 characters.")
     private String text;
 
     @Column(name="POST_DATE")

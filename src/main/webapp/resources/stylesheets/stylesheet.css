@@ -3,16 +3,48 @@
     margin-right: auto;
     width: 75%;
 }
-
 .div-border {
-    float:left;
     padding: 10px;
-    background-color: #E3E3E3;
+    background-color: #EEEEEE;
     border-radius: 10px;
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
 }
 
-body{
-    color: red;
+.div-border-pulled-left {
+    float:left;
+    padding: 10px;
+    background-color: #EEEEEE;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+
+.margin-spacing{
+    margin: 10px;
+}
+
+.FixedHeightContainer
+{
+    max-height: 650px;
+    max-width: 70%;
+}
+.Content
+{
+    max-height:550px;
+    overflow:auto;
+    overflow-x: hidden;
+}
+
+.wrapWord{
+    word-wrap: break-word;
+}
+
+#headerList li{
+    display:inline;
+    margin-right : 10px;
+    text-decoration: none;
+    list-style-type: none;
+    margin-top: 15px;
+    float: right;
 }

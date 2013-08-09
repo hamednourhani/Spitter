@@ -9,11 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 
 @Transactional
 @Controller
@@ -32,46 +30,64 @@ public class SpitterController {
         this.spittleRepository = spittleRepository;
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String createSpitterProfile(Model model){
-        model.addAttribute("spitter", new Spitter());
-        return "spitters/register";
-    }
-
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String addSpitterFromForm(@Valid Spitter spitter, BindingResult bindingResult, Model model){
-        if (bindingResult.hasErrors())
-            return "spitters/register";
-
-        spitterRepository.addSpitter(spitter);
-        return "redirect:/home";
-    }
-
-    @RequestMapping(value="/{username}", method = RequestMethod.GET)
-    public String showSpitterProfile(@PathVariable String username, Spittle spittle, Model model)
+    @RequestMapping(value="/profile/{username}", method = RequestMethod.GET)
+    public String showSpitterProfile(@PathVariable String username, Model model)
             throws IllegalStateException{
 
         Spitter spitter = spitterRepository.findByUserName(username);
-
         model.addAttribute("spitterName", username);
         model.addAttribute("spittles", spittleRepository.getSpittlesForSpitter(spitter));
         model.addAttribute("spittle", new Spittle());
         return "spitters/viewSpitterProfile";
     }
 
-    @RequestMapping(value = "/{username}/follow", method = RequestMethod.POST)
-    public String follow(@PathVariable String username){
+    @RequestMapping(value = "/profile/{username}/follow", method = RequestMethod.GET)
+    public String follow(@PathVariable String username, Model model){
 
+        Authentication user = SecurityContextHolder.getContext().getAuthentication();
+        Spitter spitter = spitterRepository.findByUserName(user.getName());
+        Spitter followee = spitterRepository.findByUserName(username);
+        final int DEFAULT_SPITTLES_PER_PAGE = 25;
+        model.addAttribute("spittleList", spittleRepository.getRecentSpittles(DEFAULT_SPITTLES_PER_PAGE));
+
+        if(spitterRepository.isUserFollowing(spitter, followee)){
+            model.addAttribute("followMessage", "You are already following user");
+            return "redirect:/spitters/profile/" + username;
+        }
+
+        spitterRepository.addFollowee(spitter, followee);
+        model.addAttribute("followMessage", "You are now following user");
+        return "redirect:/spitters/profile/" + username;
+    }
+
+    @RequestMapping(value = "/profile/{username}/viewFollowers", method = RequestMethod.GET)
+    public String getFollowers(@PathVariable String username, Model model){
+        Spitter spitter = spitterRepository.findByUserName(username);
+        model.addAttribute("followersMessage", username + " is following");
+        model.addAttribute("spitterName", username);
+        model.addAttribute("followerList", spitterRepository.getFollowers(spitter));
+        return "/displayFollowers";
+    }
+
+    @RequestMapping(value = "/profile/{username}/viewFollowees", method = RequestMethod.GET)
+    public String getFollowees(@PathVariable String username, Model model){
+        Spitter spitter = spitterRepository.findByUserName(username);
+        model.addAttribute("spitterName", username);
+        model.addAttribute("followeeList", spitterRepository.getFollowers(spitter));
+        return "/displayFollowees";
+    }
+
+    @RequestMapping(value = "/isUserFollowing", method = RequestMethod.POST)
+    public @ResponseBody String checkIfUserIsFollowing(@RequestParam(value="username", required = true)String username){
         Authentication user = SecurityContextHolder.getContext().getAuthentication();
         Spitter spitter = spitterRepository.findByUserName(user.getName());
         Spitter followee = spitterRepository.findByUserName(username);
 
         if(spitterRepository.isUserFollowing(spitter, followee)){
-            return "redirect:/spitters/viewSpitterProfile";
+            return "You are already following " + username;
         }
-
-        spitterRepository.addFollowee(spitter, followee);
-        return "redirect:/spitters/viewSpitterProfile";
+        else
+            return "You are now following " + username;
     }
 
 }
