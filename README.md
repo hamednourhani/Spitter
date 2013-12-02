@@ -1,4 +1,4 @@
 Spitter
 =======
 
-Spitter app from Spring in Action book
+Spitter app from Spring in Action book plus some additions
